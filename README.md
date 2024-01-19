@@ -1,4 +1,4 @@
-![Super Mario Bros](https://github.com/daniellopes04/super-mario-bros/blob/main/graphics/super-mario-bros-text2.png)
+![Super Mario Bros](https://github.com/daniellopes04/super-mario-bros/blob/main/graphics/super-mario-bros-text.png)
 
 ***Lecture 4* on "S50's Intro to Game Development" course, available on [YouTube](https://www.youtube.com/playlist?list=PLWKjhJtqVAbluXJKKbCIb4xd7fcRkpzoz)**
  
