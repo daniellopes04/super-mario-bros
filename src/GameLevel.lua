@@ -56,3 +56,13 @@ function GameLevel:render()
         entity:render()
     end
 end
+
+function GameLevel:getFirstGroundColumn()
+    for x = 1, self.tileMap.width do
+        for y = 1, self.tileMap.height do
+            if self.tileMap.tiles[y][x].id == TILE_ID_GROUND then
+                return x 
+            end
+        end
+    end
+end
