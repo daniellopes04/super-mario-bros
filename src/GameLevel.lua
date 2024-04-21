@@ -10,10 +10,12 @@
 
 GameLevel = Class{}
 
-function GameLevel:init(entities, objects, tilemap)
+function GameLevel:init(entities, objects, tilemap, keyColor)
     self.entities = entities
     self.objects = objects
     self.tileMap = tilemap
+    self.unlocked = false
+    self.keyColor = keyColor
 end
 
 --[[
@@ -65,4 +67,8 @@ function GameLevel:getFirstGroundColumn()
             end
         end
     end
+end
+
+function GameLevel:unlock()
+    self.unlocked = true
 end

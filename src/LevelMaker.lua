@@ -22,6 +22,12 @@ function LevelMaker.generate(width, height)
     local tileset = math.random(20)
     local topperset = math.random(20)
 
+    local isLockPlaced = false
+    local isKeyPlaced = false
+    local key = nil
+    local keyColor = math.random(#KEYS)
+    local blockColor = keyColor + 4
+
     -- insert blank tables into tiles for later access
     for x = 1, height do
         table.insert(tiles, {})
@@ -157,6 +163,73 @@ function LevelMaker.generate(width, height)
                         end
                     }
                 )
+
+            -- chance to spawn a lock block
+            elseif math.random(15) == 1 and not isLockPlaced then
+                isLockPlaced = true
+
+                table.insert(objects,
+                    -- lock block
+                    GameObject {
+                        texture = 'keys-and-locks',
+                        x = (x - 1) * TILE_SIZE,
+                        y = (blockHeight - 1) * TILE_SIZE,
+                        width = 16,
+                        height = 16,
+
+                        -- make it a random variant
+                        frame = blockColor,
+                        collidable = true,
+                        hit = false,
+                        solid = true,
+
+                        -- collision function takes itself
+                        onCollide = function(obj)
+
+                            -- there's a chance to spawn a key if we haven't already hit the block
+                            if not obj.hit then
+
+                                -- chance to spawn key, not guaranteed
+                                if not isKeyPlaced then
+                                    isKeyPlaced = true
+                                    
+                                    -- maintain reference so we can set it to nil
+                                    key = GameObject {
+                                        texture = 'keys-and-locks',
+                                        x = (x - 1) * TILE_SIZE,
+                                        y = (blockHeight - 1) * TILE_SIZE - 4,
+                                        width = 16,
+                                        height = 16,
+                                        frame = keyColor,
+                                        collidable = true,
+                                        consumable = true,
+                                        solid = false,
+                                        shiny = true,
+
+                                        -- key has its own function to add to the player's score
+                                        onConsume = function(player, object)
+                                            gSounds['pickup']:play()
+                                            player.level:unlock()
+                                            print("unlock", tostring(player.level.unlocked))
+                                        end
+                                    }
+                                    
+                                    -- make the key move up from the block and play a sound
+                                    Timer.tween(0.1, {
+                                        [key] = {y = (blockHeight - 2) * TILE_SIZE}
+                                    })
+                                    gSounds['powerup-reveal']:play()
+                                    
+                                    table.insert(objects, key)
+                                end
+
+                                obj.hit = true
+                            end
+
+                            gSounds['empty-block']:play()
+                        end
+                    }
+                )
             end
         end
     end
@@ -164,5 +237,5 @@ function LevelMaker.generate(width, height)
     local map = TileMap(width, height)
     map.tiles = tiles
     
-    return GameLevel(entities, objects, map)
+    return GameLevel(entities, objects, map, keyColor)
 end

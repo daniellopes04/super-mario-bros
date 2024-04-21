@@ -18,6 +18,27 @@ function PlayState:init()
     self.gravityOn = true
     self.gravityAmount = 6
 
+    -- Defines particle system, emitted if object is shiny
+    self.psystem = love.graphics.newParticleSystem(gTextures["particle"], 10)
+
+    -- Particle system behavior functions
+    self.psystem:setParticleLifetime(0.5, 1)
+    self.psystem:setSpeed(10, 20)
+    self.psystem:setLinearAcceleration(-15, -15, 15, 15)
+    self.psystem:setEmissionRate(5)
+    self.psystem:setSpread(20)
+    self.psystem:setOffset(-15, -15)
+    self.psystem:setEmissionArea("none", 8, 8, 1, true)
+    self.psystem:setSizes(0.5)
+
+    -- Over the particle's lifetime, we transition from first to second color
+    self.psystem:setColors(
+        -- First color
+        251/255, 242/255, 54/255, 1,
+        -- Second color
+        1, 1, 1, 0
+    )
+
     local safeX = self.level:getFirstGroundColumn()
 
     self.player = Player({
@@ -56,6 +77,10 @@ function PlayState:update(dt)
     elseif self.player.x > TILE_SIZE * self.tileMap.width - self.player.width then
         self.player.x = TILE_SIZE * self.tileMap.width - self.player.width
     end
+
+    if self.level.unlocked then 
+        self.psystem:update(dt)
+    end
 end
 
 function PlayState:render()
@@ -81,6 +106,11 @@ function PlayState:render()
     love.graphics.print(tostring(self.player.score), 5, 5)
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.print(tostring(self.player.score), 4, 4)
+
+    if self.level.unlocked then
+        love.graphics.draw(self.psystem, 4, 17)
+        love.graphics.draw(gTextures['keys-and-locks'], gFrames['keys-and-locks'][self.level.keyColor], 4, 17)
+    end
 end
 
 function PlayState:updateCamera()
